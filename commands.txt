@@ -1,0 +1,9 @@
+run this to run binvox: sudo apt-get install lib3ds-1-3
+ubuntu executable to convert model to voxel file:http://www.patrickmin.com/binvox/
+obj to voxel file converter online: http://www.drububu.com/miscellaneous/voxelizer/index.html
+some datafiles: http://people.sc.fsu.edu/~jburkardt/data/obj/obj.html
+sexy page to read binvox files: http://www.patrickmin.com/binvox/binvox.html
+
+using binvox:
+./binvox -> for description
+./binvox <off file>

@@ -1,0 +1,29 @@
+void Graph::merge(){
+  set<Node*> failed_merge_nodes;
+  int count_failed_merges = 0;
+  int size = nodes.size();
+  while(true){    
+    int pick = rand()%size;
+    set<Node*>::iterator node_merge_choice = nodes.begin()+pick;
+
+    // till a new choice for merge not found
+    while(failed_merge_nodes.find(node_merge_choice) != failed_merge_nodes.end()){
+      pick = rand()%size;
+      node_merge_choice = nodes.begin()+pick;
+    }
+    
+    if(merge(node_merge_choice)){
+      count_failed_merges = 0;
+      failed_merge_nodes.clear();
+    }
+    else{
+      count_failed_merges++;
+      failed_merge_nodes.insert(node_merge_choice);
+    }
+
+    size = nodes.size();
+    if(count_failed_merges == nodes.size()){
+      break;
+    }
+  }
+}
