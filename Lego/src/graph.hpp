@@ -18,6 +18,13 @@ private:
 	float scale;
 	int dimension;	// cell size = 1/dimension
 
+	void articulation_helper(Node * root, 
+		map<Node*, bool> &visited,
+		map<Node*, int> &disc,
+		map<Node*, int> &low,
+		map<Node*, Node*> &parent,
+		set<Node*> &articulation_points);
+
 public:	
 	Graph();
 
@@ -39,6 +46,9 @@ public:
 
 
 	int merge_cost_fn(Node* node1, Node* node2);
+
+
+	set<Node*> find_articulation_points();
 
 	AxisAlignedBox3 getAABB();
 	void draw(Graphics::RenderSystem & rs) const;
