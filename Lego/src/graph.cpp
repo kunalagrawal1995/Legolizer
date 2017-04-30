@@ -26,6 +26,19 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
 	mergedNode->add_connected(node1);
 	mergedNode->add_connected(node2);
 
+	for(auto it = node1->parents_begin(); it != node1->parents_end(); it++){
+		it->add_single_to_connected(mergedNode);
+		it->delete_connected(node1);
+	}
+
+	for(auto it = node2->parents_begin(); it != node2->parents_end(); it++){
+		it->add_single_to_connected(mergedNode);
+		it->delete_connected(node2);
+	}
+
+	mergedNode->add_parents(node1);
+	mergedNode->add_parents(node2);
+
 	mergedNode->add_neighbours(node1);
 	mergedNode->add_neighbours(node2);
 

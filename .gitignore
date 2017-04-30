@@ -1,5 +1,7 @@
 Lego/src/DGP
 Lego/src/DGP/*
 *.o
+src/*.o
+src/DGP/*.o
 Lego/Makefile
 .DS_Store
