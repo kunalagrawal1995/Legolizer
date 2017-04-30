@@ -4,12 +4,20 @@
 
 #include "node.hpp"
 #include "legoBricks.hpp"
+#include "DGP/AxisAlignedBox3.hpp"
+#include "DGP/Graphics/RenderSystem.hpp"
 using namespace std;
 
 class Graph {
 private:
 	set<Node*> nodes;
 	map<Vector3, Node*> unit_node_map;
+	AxisAlignedBox3 aabb;
+
+	Vector3 trans;
+	float scale;
+	int dimension;	// cell size = 1/dimension
+
 public:	
 	Graph();
 
@@ -31,5 +39,8 @@ public:
 
 
 	int merge_cost_fn(Node* node1, Node* node2);
+
+	AxisAlignedBox3 getAABB();
+	void draw(Graphics::RenderSystem & rs) const;
 };
 #endif

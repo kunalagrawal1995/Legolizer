@@ -4,6 +4,8 @@
 #include <bits/stdc++.h>
 #include "DGP/Vector3.hpp"
 #include "DGP/Vector2.hpp"
+#include "DGP/AxisAlignedBox3.hpp"
+#include "DGP/Graphics/RenderSystem.hpp"
 using namespace std;
 using namespace DGP;
 
@@ -11,6 +13,7 @@ class Node {
 	set<Vector3> units;	// set of unit voxels contained in this node
 	set<Node*> neighbours; // set of adjacent nodes to this node
 	map<Node*, double> connected; // set of nodes in the lower layer connected with this node mapped to the number of connections
+	AxisAlignedBox3 aabb;
 public:
 	Node();
 	Node(int x, int y, int z);
@@ -30,6 +33,8 @@ public:
 	void add_neighbour(Node * node){neighbours.insert(node);}
 	bool check_neighbour(Node * n);
 	bool contains(Vector3 v){return units.count(v) == 1;}
+	AxisAlignedBox3 getAABB();
+	void draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans) const;
 };
 
 #endif

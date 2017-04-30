@@ -1,4 +1,5 @@
 #include "node.hpp"
+#include "DGP/Graphics/Shader.hpp"
 
 Node::Node() {
 }
@@ -78,4 +79,84 @@ bool Node::check_neighbour(Node * n){
 		}
 	}
 	return false;
+}
+
+AxisAlignedBox3 Node::getAABB() {
+	return aabb;
+}
+
+void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans) const
+{
+  // // Make this static to ensure just one shader is created. Assumes rendersystem is constant, not the best design pattern.
+
+	rs.setPointSize(2.0f);
+
+	rs.beginPrimitive(Graphics::RenderSystem::Primitive::QUADS);
+	rs.setColor(ColorRGB(100, 100, 100));
+	for(auto pos: units) {
+
+		Vector3 v0 = Vector3(pos[0], pos[1], pos[2])/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v1 = Vector3(pos[0], pos[1], pos[2]+1)/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v2 = Vector3(pos[0], pos[1]+1, pos[2]+1)/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v3 = Vector3(pos[0], pos[1]+1, pos[2])/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v4 = Vector3(pos[0]+1, pos[1], pos[2])/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v5 = Vector3(pos[0]+1, pos[1], pos[2]+1)/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v6 = Vector3(pos[0]+1, pos[1]+1, pos[2]+1)/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		Vector3 v7 = Vector3(pos[0]+1, pos[1]+1, pos[2])/(dimension * scale) -
+						Vector3(trans[0], trans[1], trans[2]);
+
+		rs.setNormal(Vector3(-1,0,0));
+		rs.sendVertex(Vector3(v0));
+		rs.sendVertex(Vector3(v1));
+		rs.sendVertex(Vector3(v2));
+		rs.sendVertex(Vector3(v3));
+
+		rs.setNormal(Vector3(1,0,0));
+		rs.sendVertex(Vector3(v4));
+		rs.sendVertex(Vector3(v5));
+		rs.sendVertex(Vector3(v6));
+		rs.sendVertex(Vector3(v7));
+
+		rs.setNormal(Vector3(0,-1,0));
+		rs.sendVertex(Vector3(v0));
+		rs.sendVertex(Vector3(v4));
+		rs.sendVertex(Vector3(v7));
+		rs.sendVertex(Vector3(v3));
+
+		rs.setNormal(Vector3(0,1,0));
+		rs.sendVertex(Vector3(v1));
+		rs.sendVertex(Vector3(v5));
+		rs.sendVertex(Vector3(v6));
+		rs.sendVertex(Vector3(v2));
+
+		rs.setNormal(Vector3(0,0,1));
+		rs.sendVertex(Vector3(v0));
+		rs.sendVertex(Vector3(v4));
+		rs.sendVertex(Vector3(v5));
+		rs.sendVertex(Vector3(v1));
+
+		rs.setNormal(Vector3(0,0,-1));
+		rs.sendVertex(Vector3(v3));
+		rs.sendVertex(Vector3(v7));
+		rs.sendVertex(Vector3(v6));
+		rs.sendVertex(Vector3(v2));
+
+	}
+
+	rs.endPrimitive();
+
 }
