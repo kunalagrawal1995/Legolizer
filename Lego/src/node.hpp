@@ -13,8 +13,7 @@ class Node {
 	set<Vector3> units;	// set of unit voxels contained in this node
 	set<Node*> neighbours; // set of adjacent nodes to this node
 	set<Node*> parents; // set of parents in the layer above 
-
-	map<Node*, double> connected; // set of nodes in the lower layer connected with this node mapped to the number of connections
+	set<Node*> children; // set of nodes in the lower layer children with this node mapped to the number of connections
 	AxisAlignedBox3 aabb;
 public:
 	Node();
@@ -23,23 +22,30 @@ public:
 	int size(){return units.size();}
 	int number_intersections(Node* node); // number of intersections with another node when both AFTER projection
 	set<Vector2> project(); // project the brick on the x-y plane
+	
 	set<Vector3>::iterator units_begin(){return units.begin();}
 	set<Vector3>::iterator units_end(){return units.end();}
+	
 	set<Node *>::iterator neighbours_begin(){return neighbours.begin();}
 	set<Node *>::iterator neighbours_end(){return neighbours.end();}
+	
 	set<Node *>::iterator parents_begin(){return parents.begin();}
 	set<Node *>::iterator parents_end(){return parents.end();}
-	map<Node*, double>::iterator connected_begin(){return connected.begin();}
-	map<Node*, double>::iterator connected_end(){return connected.end();}
+	
+	set<Node*>::iterator children_begin(){return children.begin();}
+	set<Node*>::iterator children_end(){return children.end();}
+	
 	void add_units(Node * node);
-	void add_connected(Node * node);
-	void add_single_to_connected(Node * node){connected[node] = number_intersections(node);}
-	void delete_connected(Node * node){connected.erase(node);}
+	void add_children(Node * node);
+	void add_child(Node * node){children.insert(node);}
 	void add_neighbours(Node * node);
 	void add_parents(Node * node);
+	void add_neighbour(Node * node){neighbours.insert(node);}
+	
+	void delete_child(Node * node){children.erase(node);}
 	void delete_parent(Node *node){parents.erase(node);}
 	void delete_neighbour(Node * node){neighbours.erase(node);}
-	void add_neighbour(Node * node){neighbours.insert(node);}
+	
 	bool check_neighbour(Node * n);
 	bool contains(Vector3 v){return units.count(v) == 1;}
 	AxisAlignedBox3 getAABB();

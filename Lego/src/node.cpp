@@ -40,13 +40,12 @@ void Node::add_units(Node * node){
 	units.insert(node->units.begin(), node->units.end());
 }
 
-void Node::add_connected(Node * node){
-	map<Node*, double>::iterator iter;
-	iter = node->connected.begin();
-	for(; iter!= node->connected.end(); iter++) {
-		int connections = this->number_intersections(iter->first);
+void Node::add_children(Node * node){
+	auto iter = node->children.begin();
+	for(; iter!= node->children.end(); iter++) {
+		int connections = this->number_intersections(*iter);
 		if(connections > 0)
-			this->connected[iter->first] = connections;
+			this->children.insert(*iter);
 	}
 }
 
