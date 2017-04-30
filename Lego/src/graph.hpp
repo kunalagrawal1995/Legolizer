@@ -31,5 +31,6 @@ public:
 
 
 	int merge_cost_fn(Node* node1, Node* node2);
+	void print();
 };
 #endif

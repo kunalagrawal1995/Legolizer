@@ -26,12 +26,12 @@ void read_lego_bricks(string file_name){
 		}
 	}
 
-	for(auto iter: lego_bricks){
-		for(int i = 0; i<iter.size(); i++){
-			cout<<iter[i][0]<<" "<<iter[i][1]<<endl;
-		}
-		cout <<endl;
-	} 
+	// for(auto iter: lego_bricks){
+	// 	for(int i = 0; i<iter.size(); i++){
+	// 		cout<<iter[i][0]<<" "<<iter[i][1]<<endl;
+	// 	}
+	// 	cout <<endl;
+	// } 
 }
 
 
@@ -45,11 +45,15 @@ bool check_brick_validity(Node * node1, Node* node2){
 	
 	for(auto bricks_iter: lego_bricks){
 		if(bricks_iter.size() == projection.size()){
+			bool result = true;
 			for(auto bricks : bricks_iter){
-				if(projection.count(bricks+translate) == 0)
+				if(projection.count(bricks+translate) == 0){
+					result = false;
 					break;
-				return true;
+				}
 			}
+			if(result)
+				return true;
 		}
 	}
 

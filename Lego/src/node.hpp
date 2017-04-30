@@ -15,6 +15,7 @@ public:
 	Node();
 	Node(int x, int y, int z);
 	Node(Vector3 pos);
+	int size(){return units.size();}
 	int number_intersections(Node* node); // number of intersections with another node when both AFTER projection
 	set<Vector2> project(); // project the brick on the x-y plane
 	set<Vector3>::iterator units_begin(){return units.begin();}
@@ -30,6 +31,7 @@ public:
 	void add_neighbour(Node * node){neighbours.insert(node);}
 	bool check_neighbour(Node * n);
 	bool contains(Vector3 v){return units.count(v) == 1;}
+	void print();
 };
 
 #endif

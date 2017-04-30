@@ -1,6 +1,7 @@
 #include "graph.hpp"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +13,15 @@ int dimension;
 Graph::Graph(){
 }
 
+void print_neighbors(Node * node){
+  for (auto it = node->neighbours_begin(); it != node->neighbours_end(); ++it){
+    cout << (*it) << " "; 
+  }
+  cout << endl;
+}
+
 void Graph::merge_nodes(Node* node1, Node* node2) {
+  // std::cout<<"merging 2 nodes"<<std::endl;
 
   Node* mergedNode = new Node();
 
@@ -25,8 +34,11 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
   mergedNode->add_neighbours(node1);
   mergedNode->add_neighbours(node2);
 
+
   mergedNode->delete_neighbour(node1);
   mergedNode->delete_neighbour(node2);
+  node1->delete_neighbour(node2);
+  node2->delete_neighbour(node1);
 
   for (auto it = node1->neighbours_begin(); it != node1->neighbours_end(); ++it){
     (*it)->delete_neighbour(node1); 
@@ -97,14 +109,17 @@ void Graph::merge(){
     while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
       pick = rand()%size;
       node_merge_choice = nodes.begin();
-      for(int i = 1; i<pick; i++){
+      for(int i = 1; i<=pick; i++){
         node_merge_choice++;
       }
     }
     
+    std::cout << size << " " << count_failed_merges << " " << std::endl;
+
     if(merge(*node_merge_choice)){
       count_failed_merges = 0;
       failed_merge_nodes.clear();
+      std::cout << "A new merger happened" << std::endl;
     }
     else{
       count_failed_merges++;
@@ -121,8 +136,9 @@ void Graph::merge(){
 bool Graph::merge(Node* node){
   auto neighbours_iter = node->neighbours_begin();
   auto neighbours_end_iter = node->neighbours_end();
-  int connections = 0;
+  int connections = -1;
   Node* optimal = NULL;
+  // cout << "CHECKING FOR OPTIMAL" << endl;
   for(; neighbours_iter != neighbours_end_iter; neighbours_iter++){
     if(check_brick_validity(node, *neighbours_iter)){
       int merge_cost = merge_cost_fn(node, *neighbours_iter);
@@ -133,11 +149,14 @@ bool Graph::merge(Node* node){
     }
   }
   if(optimal != NULL){
+    // cout << "OPTIMAL FOUND; MERGING" << endl; 
     merge_nodes(node, optimal);
     return true;
   }
-  else
+  else{
+    // cout << "OPTIMAL NOT FOUND" << endl;
     return false;
+  }
 }
 
 int Graph::merge_cost_fn(Node * node1, Node * node2){
@@ -208,5 +227,11 @@ void Graph::graph_init(string voxel_filename){
   }
   else{
     std::cerr<<"Unable to open file "<<voxel_filename<<std::endl;
+  }
+}
+
+void Graph::print(){
+  for(auto iterator : nodes){
+    iterator->print();
   }
 }

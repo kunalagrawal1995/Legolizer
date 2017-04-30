@@ -79,3 +79,10 @@ bool Node::check_neighbour(Node * n){
 	}
 	return false;
 }
+
+void Node::print(){
+	for (auto iterator : units){
+		cout << iterator << " ";
+	}
+	cout << endl;
+}
