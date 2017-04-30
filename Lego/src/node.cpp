@@ -53,7 +53,7 @@ void Node::add_neighbours(Node * node1){
 	neighbours.insert(node1->neighbours.begin(), node1->neighbours.end());
 }
 
-void add_parents(Node * node){
+void Node::add_parents(Node * node){
 	parents.insert(node->parents.begin(), node->parents.end());
 }
 

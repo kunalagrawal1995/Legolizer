@@ -40,6 +40,7 @@ public:
 	void add_child(Node * node){children.insert(node);}
 	void add_neighbours(Node * node);
 	void add_parents(Node * node);
+	void add_parent(Node * node){parents.insert(node);}
 	void add_neighbour(Node * node){neighbours.insert(node);}
 	
 	void delete_child(Node * node){children.erase(node);}
