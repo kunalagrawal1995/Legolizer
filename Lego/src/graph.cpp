@@ -102,15 +102,23 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
 // ADD update of unit_node_map if needed
 void Graph::split_nodes(Node* node){
 	// this set can be used as needed
+    // 1. separate the units set
+    // 2. update the parent of children
+    // 3. add parent of all units
+    // 4. update parent of the node
+    // 5. update neighbours for the units
+
 	set<Node *> unit_nodes;
 	auto set_it = node->units_begin();
 	auto set_end = node->units_end();
+    // task 1
 	for(; set_it != set_end; set_it++){
 		Node* n = new Node(*set_it);
-		n->add_children(node);
 		n->recomputeAABB();
 	}
 
+
+    // task 5
 	for(auto it1: unit_nodes){
 		for (auto it2: unit_nodes){
 			if((it1)->check_neighbour(it2))
@@ -127,6 +135,29 @@ void Graph::split_nodes(Node* node){
 		}
 		(*it2)->delete_neighbour(node);
 	}
+
+    // task 3 and 4
+    for(auto it1 = node->parents_begin(); it1 != node->parents_end(); it1++){
+        (*it1)->delete_child(node);
+        for(auto it2 : unit_nodes){
+            if((*it1)->number_intersections(it2) > 0){
+                (*it1)->add_child(it2);
+                it2->add_parent(*it1);
+            }
+        }
+    }
+
+    // task 2
+    for(auto it1 = node->children_begin(); it1 != node->children_end(); it1++){
+        (*it1)->delete_parent(node);
+        for(auto it2 : unit_nodes){
+            if((*it1)->number_intersections(it2) > 0){
+                (*it1)->add_parent(it2);
+                it2->add_child(*it1);
+            }
+        }
+    }
+
 }
 
 void Graph::merge(){
