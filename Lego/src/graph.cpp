@@ -196,8 +196,8 @@ void Graph::graph_init(string voxel_filename){
 
 		int in;
 		for(int y = 0; y < dimension; y++){
-			for (int z = 0; z < dimension; ++z){
-				for (int x = 0; x < dimension; ++x){
+			for (int x = 0; x < dimension; ++x){
+				for (int z = 0; z < dimension; ++z){
 					voxel_file>>in;
 
 					if(in){
