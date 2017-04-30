@@ -42,5 +42,6 @@ public:
 
 	AxisAlignedBox3 getAABB();
 	void draw(Graphics::RenderSystem & rs) const;
+	void print();
 };
 #endif

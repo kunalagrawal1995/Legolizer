@@ -96,28 +96,28 @@ void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3
 	for(auto pos: units) {
 
 		Vector3 v0 = Vector3(pos[0], pos[1], pos[2])/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v1 = Vector3(pos[0], pos[1], pos[2]+1)/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v2 = Vector3(pos[0], pos[1]+1, pos[2]+1)/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v3 = Vector3(pos[0], pos[1]+1, pos[2])/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v4 = Vector3(pos[0]+1, pos[1], pos[2])/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v5 = Vector3(pos[0]+1, pos[1], pos[2]+1)/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v6 = Vector3(pos[0]+1, pos[1]+1, pos[2]+1)/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		Vector3 v7 = Vector3(pos[0]+1, pos[1]+1, pos[2])/(dimension * scale) -
-						Vector3(trans[0], trans[1], trans[2]);
+						trans;
 
 		rs.setNormal(Vector3(-1,0,0));
 		rs.sendVertex(Vector3(v0));
@@ -154,9 +154,53 @@ void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3
 		rs.sendVertex(Vector3(v7));
 		rs.sendVertex(Vector3(v6));
 		rs.sendVertex(Vector3(v2));
-
 	}
 
 	rs.endPrimitive();
 
+	rs.setColor(ColorRGB(0, 0, 0));
+
+	rs.pushShader();
+	rs.setShader(NULL);
+	rs.beginPrimitive(Graphics::RenderSystem::Primitive::LINES);
+	
+	Vector3 p, q;
+	for (int i = 0; i < 12; ++i) {
+		aabb.getEdge(i, p, q);
+		rs.sendVertex(p/(dimension*scale) - trans);
+		rs.sendVertex(q/(dimension*scale) - trans);
+	}
+	rs.endPrimitive();
+
+	rs.popShader();
+}
+
+void Node::recomputeAABB() {
+	aabb.setNull();
+	for(auto pos: units) {
+		Vector3 v0 = Vector3(pos[0], pos[1], pos[2]);
+		Vector3 v1 = Vector3(pos[0], pos[1], pos[2]+1);
+		Vector3 v2 = Vector3(pos[0], pos[1]+1, pos[2]+1);
+		Vector3 v3 = Vector3(pos[0], pos[1]+1, pos[2]);
+		Vector3 v4 = Vector3(pos[0]+1, pos[1], pos[2]);
+		Vector3 v5 = Vector3(pos[0]+1, pos[1], pos[2]+1);
+		Vector3 v6 = Vector3(pos[0]+1, pos[1]+1, pos[2]+1);
+		Vector3 v7 = Vector3(pos[0]+1, pos[1]+1, pos[2]);
+		aabb.addPoint(v0);
+		aabb.addPoint(v1);
+		aabb.addPoint(v2);
+		aabb.addPoint(v3);
+		aabb.addPoint(v4);
+		aabb.addPoint(v5);
+		aabb.addPoint(v6);
+		aabb.addPoint(v7);
+	}
+}
+
+
+void Node::print(){
+	for (auto iterator : units){
+		cout << iterator << " ";
+	}
+	cout << endl;
 }

@@ -9,9 +9,16 @@ int main(int argc, char *argv[]){
 
 	Graph graph;
 	graph.graph_init(argv[1]);
+	cout << "GRAPH READ" << endl;
 	read_lego_bricks("src/legoBricksConfig.txt");
+	
+	graph.merge();
 
 	Viewer viewer;
 	viewer.setObject(&graph);
 	viewer.launch(argc, argv);
+	cout << "READ LEGO BRICKS" << endl;
+	
+	graph.print();
+
 }

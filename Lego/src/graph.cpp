@@ -1,13 +1,22 @@
 #include "graph.hpp"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
 Graph::Graph(){
 }
 
+void print_neighbors(Node * node){
+  for (auto it = node->neighbours_begin(); it != node->neighbours_end(); ++it){
+    cout << (*it) << " "; 
+  }
+  cout << endl;
+}
+
 void Graph::merge_nodes(Node* node1, Node* node2) {
+  // std::cout<<"merging 2 nodes"<<std::endl;
 
 	Node* mergedNode = new Node();
 
@@ -22,6 +31,9 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
 
 	mergedNode->delete_neighbour(node1);
 	mergedNode->delete_neighbour(node2);
+
+	node1->delete_neighbour(node2);
+	node2->delete_neighbour(node1);
 
 	for (auto it = node1->neighbours_begin(); it != node1->neighbours_end(); ++it){
 		(*it)->delete_neighbour(node1); 
@@ -44,6 +56,7 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
 	nodes.erase(node1);
 	nodes.erase(node2);
 	nodes.insert(mergedNode);
+	mergedNode->recomputeAABB();
 	delete(node1);
 	delete(node2);
 }
@@ -57,6 +70,7 @@ void Graph::split_nodes(Node* node){
 	for(; set_it != set_end; set_it++){
 		Node* n = new Node(*set_it);
 		n->add_connected(node);
+		n->recomputeAABB();
 	}
 
 	for(auto it1: unit_nodes){
@@ -78,61 +92,68 @@ void Graph::split_nodes(Node* node){
 }
 
 void Graph::merge(){
-	set<Node*> failed_merge_nodes;
-	int count_failed_merges = 0;
-	int size = nodes.size();
-	while(true){    
-		int pick = rand()%size;
-		set<Node*>::iterator node_merge_choice = nodes.begin();
-		for(int i = 1; i<pick; i++){
-			node_merge_choice++;
-		}
+  set<Node*> failed_merge_nodes;
+  int count_failed_merges = 0;
+  int size = nodes.size();
+  while(true){    
+    int pick = rand()%size;
+    set<Node*>::iterator node_merge_choice = nodes.begin();
+    for(int i = 1; i<pick; i++){
+      node_merge_choice++;
+    }
 
-		// till a new choice for merge not found
-		while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
-			pick = rand()%size;
-			node_merge_choice = nodes.begin();
-			for(int i = 1; i<pick; i++){
-				node_merge_choice++;
-			}
-		}
-		
-		if(merge(*node_merge_choice)){
-			count_failed_merges = 0;
-			failed_merge_nodes.clear();
-		}
-		else{
-			count_failed_merges++;
-			failed_merge_nodes.insert(*node_merge_choice);
-		}
+    // till a new choice for merge not found
+    while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
+      pick = rand()%size;
+      node_merge_choice = nodes.begin();
+      for(int i = 1; i<=pick; i++){
+        node_merge_choice++;
+      }
+    }
+    
+    std::cout << size << " " << count_failed_merges << " " << std::endl;
 
-		size = nodes.size();
-		if(count_failed_merges == nodes.size()){
-			break;
-		}
-	}
+    if(merge(*node_merge_choice)){
+      count_failed_merges = 0;
+      failed_merge_nodes.clear();
+      std::cout << "A new merger happened" << std::endl;
+    }
+    else{
+      count_failed_merges++;
+      failed_merge_nodes.insert(*node_merge_choice);
+    }
+
+    size = nodes.size();
+    if(count_failed_merges == nodes.size()){
+      break;
+    }
+  }
 }
 
 bool Graph::merge(Node* node){
-	auto neighbours_iter = node->neighbours_begin();
-	auto neighbours_end_iter = node->neighbours_end();
-	int connections = 0;
-	Node* optimal = NULL;
-	for(; neighbours_iter != neighbours_end_iter; neighbours_iter++){
-		if(check_brick_validity(node, *neighbours_iter)){
-			int merge_cost = merge_cost_fn(node, *neighbours_iter);
-			if(connections < merge_cost){
-				connections = merge_cost;
-				optimal = *neighbours_iter;
-			}   
-		}
-	}
-	if(optimal != NULL){
-		merge_nodes(node, optimal);
-		return true;
-	}
-	else
-		return false;
+  auto neighbours_iter = node->neighbours_begin();
+  auto neighbours_end_iter = node->neighbours_end();
+  int connections = -1;
+  Node* optimal = NULL;
+  // cout << "CHECKING FOR OPTIMAL" << endl;
+  for(; neighbours_iter != neighbours_end_iter; neighbours_iter++){
+    if(check_brick_validity(node, *neighbours_iter)){
+      int merge_cost = merge_cost_fn(node, *neighbours_iter);
+      if(connections < merge_cost){
+        connections = merge_cost;
+        optimal = *neighbours_iter;
+      }   
+    }
+  }
+  if(optimal != NULL){
+    // cout << "OPTIMAL FOUND; MERGING" << endl; 
+    merge_nodes(node, optimal);
+    return true;
+  }
+  else{
+    // cout << "OPTIMAL NOT FOUND" << endl;
+    return false;
+  }
 }
 
 int Graph::merge_cost_fn(Node * node1, Node * node2){
@@ -194,6 +215,7 @@ void Graph::graph_init(string voxel_filename){
 						}
 						nodes.insert(node);
 						unit_node_map.insert(make_pair(Vector3(x,y,z),node));
+						node->recomputeAABB();
 					}
 				}
 			}
@@ -219,4 +241,10 @@ void Graph::draw(Graphics::RenderSystem & rs) const
 	for(auto node: nodes) {
 		node->draw(rs, dimension, scale, trans);
 	} 
+}
+
+void Graph::print(){
+  for(auto iterator : nodes){
+    iterator->print();
+  }
 }
