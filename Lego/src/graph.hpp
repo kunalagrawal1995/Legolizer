@@ -41,7 +41,7 @@ public:
 	int merge_cost_fn(Node* node1, Node* node2);
 
 	AxisAlignedBox3 getAABB();
-	void draw(Graphics::RenderSystem & rs) const;
+	void draw(Graphics::RenderSystem & rs, bool show_graph) const;
 	void print();
 };
 #endif

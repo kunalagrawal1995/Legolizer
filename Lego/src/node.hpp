@@ -50,9 +50,10 @@ public:
 	bool check_neighbour(Node * n);
 	bool contains(Vector3 v){return units.count(v) == 1;}
 	AxisAlignedBox3 getAABB();
-	void draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans) const;
+	void draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans, bool show_graph) const;
 	void print();
 	void recomputeAABB();
+	Vector3 get_centroid();
 };
 
 #endif

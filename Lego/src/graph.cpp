@@ -305,10 +305,10 @@ AxisAlignedBox3 Graph::getAABB() {
 	return aabb;
 }
 
-void Graph::draw(Graphics::RenderSystem & rs) const
+void Graph::draw(Graphics::RenderSystem & rs, bool show_graph) const
 {
 	for(auto node: nodes) {
-		node->draw(rs, dimension, scale, trans);
+		node->draw(rs, dimension, scale, trans, show_graph);
 	} 
 }
 

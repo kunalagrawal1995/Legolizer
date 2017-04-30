@@ -21,8 +21,7 @@ int Viewer::last_x = -1;
 int Viewer::last_y = -1;
 int Viewer::drag_start_x = -1;
 int Viewer::drag_start_y = -1;
-bool Viewer::show_normals = false;
-bool Viewer::show_bbox = false;
+bool Viewer::show_graph = false;
 
 Matrix3
 dragToRotation(int x1, int y1, int x2, int y2, int width, int height, Camera const & camera)
@@ -159,7 +158,7 @@ Viewer::draw()
       Real scale = graph->getAABB().getExtent().length();
       
       // Draw the 
-      graph->draw(*render_system);
+      graph->draw(*render_system, show_graph);
 
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::PROJECTION); render_system->popMatrix();
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::MODELVIEW); render_system->popMatrix();
@@ -189,6 +188,10 @@ Viewer::keyPress(unsigned char key, int x, int y)
   else if (key == 'f' || key == 'F')
   {
     fitCameraToObject();
+    glutPostRedisplay();
+  }
+  else if (key == 'g' || key == 'G') {
+    show_graph = !show_graph;
     glutPostRedisplay();
   }
 }
@@ -252,26 +255,4 @@ Viewer::mouseMotion(int x, int y)
 
   last_x = x;
   last_y = y;
-}
-
-void
-Viewer::drawOutlineBox(AxisAlignedBox3 const & bbox)
-{
-  if (!render_system)
-    return;
-
-  render_system->pushShader();
-    render_system->setShader(NULL);
-
-    render_system->beginPrimitive(Graphics::RenderSystem::Primitive::LINES);
-      Vector3 p, q;
-      for (int i = 0; i < 12; ++i)
-      {
-        bbox.getEdge(i, p, q);
-        render_system->sendVertex(p);
-        render_system->sendVertex(q);
-      }
-    render_system->endPrimitive();
-
-  render_system->popShader();
 }

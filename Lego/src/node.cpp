@@ -89,9 +89,40 @@ AxisAlignedBox3 Node::getAABB() {
 	return aabb;
 }
 
-void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans) const
+void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans, bool show_graph) const
 {
   // // Make this static to ensure just one shader is created. Assumes rendersystem is constant, not the best design pattern.
+
+	if(show_graph) {
+		rs.setPointSize(2.0f);
+
+		rs.beginPrimitive(Graphics::RenderSystem::Primitive::POINTS);
+		rs.setColor(ColorRGB(100, 100, 100));
+		Vector3 centroid = Vector3(0,0,0);
+		for(auto pos: units) {
+
+			centroid += Vector3(pos[0]+0.5, pos[1]+0.5, pos[2]+0.5)/(dimension * scale) -
+							trans;
+		}
+
+		centroid /= units.size();
+		rs.sendVertex(centroid);
+		rs.endPrimitive();
+
+		rs.setColor(ColorRGB(255, 255, 255));
+		rs.pushShader();
+		rs.setShader(NULL);
+		
+		rs.beginPrimitive(Graphics::RenderSystem::Primitive::LINES);
+		for (auto child: children) {
+			rs.sendVertex(centroid);
+			rs.sendVertex((child->get_centroid())/(dimension*scale) - trans);
+		}
+		rs.endPrimitive();
+
+		rs.popShader();		
+		return;
+	}
 
 	rs.setPointSize(2.0f);
 
@@ -207,4 +238,14 @@ void Node::print(){
 		cout << iterator << " ";
 	}
 	cout << endl;
+}
+
+Vector3 Node::get_centroid() {
+	Vector3 centroid = Vector3(0,0,0);
+	for(auto pos: units) {
+		centroid += Vector3(pos[0]+0.5, pos[1]+0.5, pos[2]+0.5);
+	}
+
+	centroid /= units.size();
+	return centroid;
 }

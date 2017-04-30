@@ -23,8 +23,8 @@ class Viewer
     static int modifier_keys;
     static int last_x, last_y;
     static int drag_start_x, drag_start_y;
-    static bool show_normals;
-    static bool show_bbox;
+    static bool show_graph;
+
 
   public:
     /** Set the graph to be displayed. The object must persist as long as the viewer does. */
@@ -51,9 +51,6 @@ class Viewer
 
     /** Callback when the mouse moves with a button pressed. */
     static void mouseMotion(int x, int y);
-
-    /** Draw a bounding box as an outline. */
-    static void drawOutlineBox(AxisAlignedBox3 const & bbox);
 
     /** Position the camera to center the object and fit it in the frame, without changing orientation. */
     static void fitCameraToObject();
