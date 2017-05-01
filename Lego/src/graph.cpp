@@ -15,7 +15,7 @@ void print_neighbors(Node * node){
   cout << endl;
 }
 
-void Graph::merge_nodes(Node* node1, Node* node2) {
+Node* Graph::merge_nodes(Node* node1, Node* node2) {
   // std::cout<<"merging 2 nodes"<<std::endl;
 	// 1: union of units
     // 2: union of children
@@ -95,8 +95,10 @@ void Graph::merge_nodes(Node* node1, Node* node2) {
 	nodes.erase(node2);
 	nodes.insert(mergedNode);
 	mergedNode->recomputeAABB();
-	delete(node1);
-	delete(node2);
+  return mergedNode;
+	// shifted to individual segments to delete these
+	// delete(node1);
+	// delete(node2);
 }
 
 // ADD update of unit_node_map if needed
@@ -165,41 +167,87 @@ void Graph::merge(){
   int count_failed_merges = 0;
   int size = nodes.size();
   while(true){    
-	int pick = rand()%size;
-	set<Node*>::iterator node_merge_choice = nodes.begin();
-	for(int i = 1; i<pick; i++){
-	  node_merge_choice++;
-	}
+  	int pick = rand()%size;
+  	set<Node*>::iterator node_merge_choice = nodes.begin();
+  	for(int i = 1; i<pick; i++){
+  	  node_merge_choice++;
+  	}
 
-	// till a new choice for merge not found
-	while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
-	  pick = rand()%size;
-	  node_merge_choice = nodes.begin();
-	  for(int i = 1; i<=pick; i++){
-		node_merge_choice++;
-	  }
-	}
-	
-	// std::cout << size << " " << count_failed_merges << " " << std::endl;
+  	// till a new choice for merge not found
+  	while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
+  	  pick = rand()%size;
+  	  node_merge_choice = nodes.begin();
+  	  for(int i = 1; i<=pick; i++){
+  		node_merge_choice++;
+  	  }
+  	}
+  	
+  	Node * optimal = check_merge(*node_merge_choice);
+  	if(optimal != NULL){
+      // delete no longer happend in the merge function
+      merge_nodes(*node_merge_choice, optimal);
+      delete(*node_merge_choice);
+      delete(optimal);
+      count_failed_merges = 0;
+  	  failed_merge_nodes.clear();
+  	}
+  	else{
+  	  count_failed_merges++;
+  	  failed_merge_nodes.insert(*node_merge_choice);
+  	}
 
-	if(merge(*node_merge_choice)){
-	  count_failed_merges = 0;
-	  failed_merge_nodes.clear();
-	  // std::cout << "A new merger happened" << std::endl;
-	}
-	else{
-	  count_failed_merges++;
-	  failed_merge_nodes.insert(*node_merge_choice);
-	}
-
-	size = nodes.size();
-	if(count_failed_merges == nodes.size()){
-	  break;
-	}
+  	size = nodes.size();
+  	if(count_failed_merges == nodes.size()){
+  	  break;
+  	}
   }
 }
 
-bool Graph::merge(Node* node){
+void Graph::merge(set<Node*> nodes_subset){
+  set<Node*> failed_merge_nodes;
+  int count_failed_merges = 0;
+  int size = nodes_subset.size();
+  while(true){    
+    int pick = rand()%size;
+    set<Node*>::iterator node_merge_choice = nodes_subset.begin();
+    for(int i = 1; i<pick; i++){
+      node_merge_choice++;
+    }
+
+    // till a new choice for merge not found
+    while(failed_merge_nodes.find(*node_merge_choice) != failed_merge_nodes.end()){
+      pick = rand()%size;
+      node_merge_choice = nodes_subset.begin();
+      for(int i = 1; i<=pick; i++){
+      node_merge_choice++;
+      }
+    }
+    
+    Node * optimal = check_merge(*node_merge_choice);
+    if(optimal != NULL){
+      Node * merged_node = merge_nodes(*node_merge_choice, optimal);
+      // also update the nodes_subset;  the graph has already been updated in the merge_nodes function
+      nodes_subset.erase(node_merge_choice);
+      nodes_subset.erase(optimal);
+      nodes_subset.insert(merged_node);
+      delete(*node_merge_choice);
+      delete(optimal);
+      count_failed_merges = 0;
+      failed_merge_nodes.clear();
+    }
+    else{
+      count_failed_merges++;
+      failed_merge_nodes.insert(*node_merge_choice);
+    }
+
+    size = nodes_subset.size();
+    if(count_failed_merges == size){
+      break;
+    }
+  }
+}
+
+Node* Graph::check_merge(Node* node){
   auto neighbours_iter = node->neighbours_begin();
   auto neighbours_end_iter = node->neighbours_end();
   int connections = -1;
@@ -215,13 +263,10 @@ bool Graph::merge(Node* node){
 	}
   }
   if(optimal != NULL){
-	// cout << "OPTIMAL FOUND; MERGING" << endl; 
-	merge_nodes(node, optimal);
-	return true;
+  	return optimal;
   }
   else{
-	// cout << "OPTIMAL NOT FOUND" << endl;
-	return false;
+	 return NULL;
   }
 }
 

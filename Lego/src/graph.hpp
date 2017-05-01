@@ -30,15 +30,18 @@ public:
 
 	//read voxel file and set up each node
 	void graph_init(string voxel_file);
-	// merges two given nodes
-	void merge_nodes(Node* node1, Node* node2);
+	// merges two given nodes and returns the merged node
+	Node* merge_nodes(Node* node1, Node* node2);
 	// split a node into 1*1 units
 	void split_nodes(Node* node);
 
 	// merge till no possible merges left
 	void merge();
-	// merge from the given node if possible
-	bool merge(Node* nodes);
+	// merge till possible but the selection is only from the given set of nodes
+	void merge(set<Node *> nodes_subset);
+	
+	// check if the node can be merged with a neighbour, return pointer to the node if possible else NULL
+	Node * check_merge(Node* node);
 
 	// returns the number of nodes in the graph
 	int num_nodes(){return nodes.size();}
