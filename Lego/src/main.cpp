@@ -16,21 +16,25 @@ int main(int argc, char *argv[]){
 
 	graph.merge();
 	set<Node*> temp = graph.find_articulation_points();
-	cout << "PRINTING ARTICULATION POINTS.." << endl;
-	for(auto iter: temp){
-		iter->print();
-	}
+	// cout << "PRINTING ARTICULATION POINTS.." << endl;
+	// for(auto iter: temp){
+	// 	iter->print();
+	// }
 	
+	cout << "Number of articulation points: " << temp.size() << endl;
+	cout << "ARTICULATION POINT REMOVAL ATTEMPTED" << endl;
+
 	if(temp.size() > 0){
 		graph.remove_articulation_point(*(temp.begin()));
 	}
-	cout << "ARTICULATION POINTS REMOVAL ATTEMPTED" << endl;
+	cout << "ARTICULATION POINT REMOVED" << endl;
 	
 	set<Node*> temp1 = graph.find_articulation_points();
-	cout << "PRINTING ARTICULATION POINTS.." << endl;
-	for(auto iter: temp1){
-		iter->print();
-	}
+	cout << "Number of articulation points: " << temp1.size() << endl;
+	// cout << "PRINTING ARTICULATION POINTS.." << endl;
+	// for(auto iter: temp1){
+	// 	iter->print();
+	// }
 	cout << "DONE" << endl;
 	// graph.print();
 	Viewer viewer;

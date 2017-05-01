@@ -28,15 +28,15 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 
 	Node* mergedNode = new Node();
 
-    // task1
+  cout << "1" << endl;
 	mergedNode->add_units(node1);
 	mergedNode->add_units(node2);
 
-    // task2
+  cout << "2" << endl;
 	mergedNode->add_children(node1);
 	mergedNode->add_children(node2);
 
-    // task 5
+  cout << "5" << endl;
 	for(auto it = node1->parents_begin(); it != node1->parents_end(); it++){
 		(*it)->add_child(mergedNode);
 		(*it)->delete_child(node1);
@@ -47,42 +47,46 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 		(*it)->delete_child(node2);
 	}
 
-    // task 4
-    for(auto it = node1->children_begin(); it != node1->children_end(); it++){
-        (*it)->delete_parent(node1);
-        (*it)->add_parent(mergedNode);
-    }
+  cout << "4" << endl;
+  for(auto it = node1->children_begin(); it != node1->children_end(); it++){
+      (*it)->delete_parent(node1);
+      (*it)->add_parent(mergedNode);
+  }
 
-    for(auto it = node2->children_begin(); it != node2->children_end(); it++){
-        (*it)->delete_parent(node2);
-        (*it)->add_parent(mergedNode);
-    }
+  for(auto it = node2->children_begin(); it != node2->children_end(); it++){
+      (*it)->delete_parent(node2);
+      (*it)->add_parent(mergedNode);
+  }
 
-    // task 3
+  cout << "3" << endl;
 	mergedNode->add_parents(node1);
 	mergedNode->add_parents(node2);
 
-    // task 6
+  cout << "6" << endl;
 	mergedNode->add_neighbours(node1);
 	mergedNode->add_neighbours(node2);
 	mergedNode->delete_neighbour(node1);
 	mergedNode->delete_neighbour(node2);
 
-    // task 7
+  cout << "7" << endl;
 	node1->delete_neighbour(node2);
 	node2->delete_neighbour(node1);
 
+  cout << "8" << endl;
 	for (auto it = node1->neighbours_begin(); it != node1->neighbours_end(); ++it){
-		(*it)->delete_neighbour(node1); 
+		cout << (*it) << endl;
+    (*it)->delete_neighbour(node1); 
 		(*it)->add_neighbour(mergedNode); 
 	}
 
+  cout << "9" << endl;
 	for (auto it = node2->neighbours_begin(); it != node2->neighbours_end(); ++it){
 		(*it)->delete_neighbour(node2); 
 		(*it)->add_neighbour(mergedNode); 
 	}
 
-    // updating unit to node mapping
+  cout << "10" << endl;
+  // updating unit to node mapping
 	for(auto it = node1->units_begin(); it != node1->units_end(); ++it){
 		unit_node_map[*it] = mergedNode;
 	}
@@ -91,10 +95,12 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 		unit_node_map[*it] = mergedNode;
 	}
 
+  cout << "11" << endl;
 	nodes.erase(node1);
 	nodes.erase(node2);
 	nodes.insert(mergedNode);
 	mergedNode->recomputeAABB();
+  cout << node1 << " " << node2 << " " << mergedNode << endl;
   return mergedNode;
 	// shifted to individual segments to delete these
 	// delete(node1);
@@ -135,8 +141,11 @@ set<Node *> Graph::split_node(Node* node){
 				(*it2)->add_neighbour(it1);
 			}
 		}
-		(*it2)->delete_neighbour(node);
-	}
+  }
+
+	for (auto it2 = node->neighbours_begin(); it2 != node->neighbours_end(); it2++){
+    (*it2)->delete_neighbour(node);
+  }
 
   // task 3 and 4
   for(auto it1 = node->parents_begin(); it1 != node->parents_end(); it1++){
@@ -172,7 +181,7 @@ void Graph::merge(){
   while(true){    
   	int pick = rand()%size;
   	set<Node*>::iterator node_merge_choice = nodes.begin();
-  	for(int i = 1; i<pick; i++){
+  	for(int i = 1; i<=pick; i++){
   	  node_merge_choice++;
   	}
 
@@ -189,8 +198,8 @@ void Graph::merge(){
   	if(optimal != NULL){
       // delete no longer happend in the merge function
       merge_nodes(*node_merge_choice, optimal);
-      delete(*node_merge_choice);
-      delete(optimal);
+      // delete(*node_merge_choice);
+      // delete(optimal);
       count_failed_merges = 0;
   	  failed_merge_nodes.clear();
   	}
@@ -211,10 +220,10 @@ void Graph::merge(set<Node*> &nodes_subset){
   int count_failed_merges = 0;
   int size = nodes_subset.size();
   while(true){    
-    // cout << size << endl;
+    cout << size << " " << count_failed_merges << endl;
     int pick = rand()%size;
     set<Node*>::iterator node_merge_choice = nodes_subset.begin();
-    for(int i = 1; i<pick; i++){
+    for(int i = 1; i<=pick; i++){
       node_merge_choice++;
     }
 
@@ -227,25 +236,29 @@ void Graph::merge(set<Node*> &nodes_subset){
       }
     }
     
+    cout << "node picked " << endl;
     Node * optimal = check_merge(*node_merge_choice);
     if(optimal != NULL){
+      cout << "merging node found " << endl;
+      cout << optimal << " " << *node_merge_choice << endl;
       Node * merged_node = merge_nodes(*node_merge_choice, optimal);
       // also update the nodes_subset;  the graph has already been updated in the merge_nodes function
-      nodes_subset.erase(node_merge_choice);
-      nodes_subset.erase(optimal);
+      nodes_subset.erase(*node_merge_choice);
+      if(nodes_subset.count(optimal) == 1)
+        nodes_subset.erase(optimal);
       nodes_subset.insert(merged_node);
-      delete(*node_merge_choice);
-      delete(optimal);
+      // delete(*node_merge_choice);
+      // delete(optimal);
       count_failed_merges = 0;
       failed_merge_nodes.clear();
     }
     else{
+      cout << "merging node not found " << endl;
       count_failed_merges++;
       failed_merge_nodes.insert(*node_merge_choice);
     }
 
     size = nodes_subset.size();
-    // cout << "later " << size << " " << count_failed_merges << endl;
     if(count_failed_merges == size){
       break;
     }
@@ -258,22 +271,17 @@ Node* Graph::check_merge(Node* node){
   auto neighbours_end_iter = node->neighbours_end();
   int connections = -1;
   Node* optimal = NULL;
-  // cout << "CHECKING FOR OPTIMAL" << endl;
   for(; neighbours_iter != neighbours_end_iter; neighbours_iter++){
-	if(check_brick_validity(node, *neighbours_iter)){
-	  int merge_cost = merge_cost_fn(node, *neighbours_iter);
-	  if(connections < merge_cost){
-		connections = merge_cost;
-		optimal = *neighbours_iter;
-	  }   
-	}
+    if(check_brick_validity(node, *neighbours_iter)){
+  	  int merge_cost = merge_cost_fn(node, *neighbours_iter);
+  	  if(connections < merge_cost){
+  		  connections = merge_cost;
+  		  optimal = *neighbours_iter;
+  	  }   
+  	}
   }
-  if(optimal != NULL){
-  	return optimal;
-  }
-  else{
-	 return NULL;
-  }
+
+  return optimal;
 }
 
 int Graph::merge_cost_fn(Node * node1, Node * node2){
@@ -443,6 +451,11 @@ void Graph::remove_articulation_point(Node * node){
     units.insert(neighbour_units.begin(), neighbour_units.end());
   }
 
+  cout << units.size() << endl;
+  for(auto iter : neighbours){
+    // delete(iter);
+  }
+  // delete(node);
   merge(units);
 
 }

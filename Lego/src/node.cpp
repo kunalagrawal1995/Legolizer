@@ -27,15 +27,6 @@ int Node::number_intersections(Node* node) {
 	return count;
 }
 
-// set<Vector3>::iterator units_begin(){
-// 	return units.begin();
-// }
-
-
-// set<Vector3>::iterator units_end(){
-// 	return units.end();
-// }
-
 void Node::add_units(Node * node){
 	units.insert(node->units.begin(), node->units.end());
 }
@@ -59,12 +50,18 @@ void Node::add_parents(Node * node){
 
 
 set<Vector2> Node::project() {
+	// cout << "project called" << endl; 
 	set<Vector2> projection;
-
-	set<Vector3>::iterator it = units.begin();
-	for(; it != units.end(); it++) {
-		projection.insert(Vector2((*it)[0], (*it)[1]));
+	int count = 0;
+	// set<Vector3>::iterator it = units.begin();
+	for(auto it : units) {
+		// cout << count++ << " " << units.size() << endl;
+		if(count > units.size())
+			break;
+		projection.insert(Vector2((it)[0], (it)[1]));
 	}
+	// cout << "project finished" << endl; 
+
 	return projection;
 }
 
