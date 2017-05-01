@@ -28,15 +28,15 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 
 	Node* mergedNode = new Node();
 
-  cout << "1" << endl;
+  // task1 
 	mergedNode->add_units(node1);
 	mergedNode->add_units(node2);
 
-  cout << "2" << endl;
+  // task2 
 	mergedNode->add_children(node1);
 	mergedNode->add_children(node2);
 
-  cout << "5" << endl;
+  // task5 
 	for(auto it = node1->parents_begin(); it != node1->parents_end(); it++){
 		(*it)->add_child(mergedNode);
 		(*it)->delete_child(node1);
@@ -47,7 +47,7 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 		(*it)->delete_child(node2);
 	}
 
-  cout << "4" << endl;
+  // task4 
   for(auto it = node1->children_begin(); it != node1->children_end(); it++){
       (*it)->delete_parent(node1);
       (*it)->add_parent(mergedNode);
@@ -58,34 +58,30 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
       (*it)->add_parent(mergedNode);
   }
 
-  cout << "3" << endl;
+  // task3 
 	mergedNode->add_parents(node1);
 	mergedNode->add_parents(node2);
 
-  cout << "6" << endl;
+  // task6 
 	mergedNode->add_neighbours(node1);
 	mergedNode->add_neighbours(node2);
 	mergedNode->delete_neighbour(node1);
 	mergedNode->delete_neighbour(node2);
 
-  cout << "7" << endl;
+  // task7 
 	node1->delete_neighbour(node2);
 	node2->delete_neighbour(node1);
 
-  cout << "8" << endl;
 	for (auto it = node1->neighbours_begin(); it != node1->neighbours_end(); ++it){
-		cout << (*it) << endl;
     (*it)->delete_neighbour(node1); 
 		(*it)->add_neighbour(mergedNode); 
 	}
 
-  cout << "9" << endl;
 	for (auto it = node2->neighbours_begin(); it != node2->neighbours_end(); ++it){
 		(*it)->delete_neighbour(node2); 
 		(*it)->add_neighbour(mergedNode); 
 	}
 
-  cout << "10" << endl;
   // updating unit to node mapping
 	for(auto it = node1->units_begin(); it != node1->units_end(); ++it){
 		unit_node_map[*it] = mergedNode;
@@ -95,12 +91,10 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 		unit_node_map[*it] = mergedNode;
 	}
 
-  cout << "11" << endl;
 	nodes.erase(node1);
 	nodes.erase(node2);
 	nodes.insert(mergedNode);
 	mergedNode->recomputeAABB();
-  cout << node1 << " " << node2 << " " << mergedNode << endl;
   return mergedNode;
 	// shifted to individual segments to delete these
 	// delete(node1);
@@ -220,7 +214,7 @@ void Graph::merge(set<Node*> &nodes_subset){
   int count_failed_merges = 0;
   int size = nodes_subset.size();
   while(true){    
-    cout << size << " " << count_failed_merges << endl;
+    // cout << size << " " << count_failed_merges << endl;
     int pick = rand()%size;
     set<Node*>::iterator node_merge_choice = nodes_subset.begin();
     for(int i = 1; i<=pick; i++){
@@ -236,11 +230,8 @@ void Graph::merge(set<Node*> &nodes_subset){
       }
     }
     
-    cout << "node picked " << endl;
     Node * optimal = check_merge(*node_merge_choice);
     if(optimal != NULL){
-      cout << "merging node found " << endl;
-      cout << optimal << " " << *node_merge_choice << endl;
       Node * merged_node = merge_nodes(*node_merge_choice, optimal);
       // also update the nodes_subset;  the graph has already been updated in the merge_nodes function
       nodes_subset.erase(*node_merge_choice);
@@ -253,7 +244,6 @@ void Graph::merge(set<Node*> &nodes_subset){
       failed_merge_nodes.clear();
     }
     else{
-      cout << "merging node not found " << endl;
       count_failed_merges++;
       failed_merge_nodes.insert(*node_merge_choice);
     }
@@ -263,7 +253,6 @@ void Graph::merge(set<Node*> &nodes_subset){
       break;
     }
   }
-  cout << "function ended" << endl;
 }
 
 Node* Graph::check_merge(Node* node){
@@ -451,7 +440,6 @@ void Graph::remove_articulation_point(Node * node){
     units.insert(neighbour_units.begin(), neighbour_units.end());
   }
 
-  cout << units.size() << endl;
   for(auto iter : neighbours){
     // delete(iter);
   }

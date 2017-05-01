@@ -36,22 +36,16 @@ void read_lego_bricks(string file_name){
 
 
 bool check_brick_validity(Node * node1, Node* node2){
-	// cout << "1" << endl;
 	set<Vector2> node1_projection = node1->project();
-	// cout << "2" << endl;
 	set<Vector2> node2_projection = node2->project();
-	// cout << "3" << endl;
 
 
 	set<Vector2> projection = node1_projection;
-	// cout << "4" << endl;
 
 	projection.insert(node2_projection.begin(), node2_projection.end());
-	// cout << "5" << endl;
 	Vector2 translate = *(projection.begin());
 	
 	for(auto bricks_iter: lego_bricks){
-		// cout << "hello " << endl;
 		if(bricks_iter.size() == projection.size()){
 			bool result = true;
 			for(auto bricks : bricks_iter){
