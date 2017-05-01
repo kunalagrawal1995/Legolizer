@@ -10,16 +10,28 @@ int main(int argc, char *argv[]){
 	Graph graph;
 	graph.graph_init(argv[1]);
 	cout << "GRAPH READ" << endl;
-	read_lego_bricks("src/legoBricksConfig.txt");
 	
+	read_lego_bricks("src/legoBricksConfig.txt");
+	cout << "LEGO BRICKS READ" << endl;
 
 	graph.merge();
 	set<Node*> temp = graph.find_articulation_points();
-	cout<<"PRINTING ARTICULATION POINTS.."<<endl;
+	cout << "PRINTING ARTICULATION POINTS.." << endl;
 	for(auto iter: temp){
 		iter->print();
 	}
-	cout<<"DONE"<<endl;
+	
+	// for(auto iter: temp){
+	// 	graph.remove_articulation_point(iter);
+	// }
+	// cout << "ARTICULATION POINTS REMOVAL ATTEMPTED" << endl;
+	
+	// set<Node*> temp1 = graph.find_articulation_points();
+	// cout << "PRINTING ARTICULATION POINTS.." << endl;
+	// for(auto iter: temp1){
+	// 	iter->print();
+	// }
+	// cout << "DONE" << endl;
 	// graph.print();
 	Viewer viewer;
 	viewer.setObject(&graph);

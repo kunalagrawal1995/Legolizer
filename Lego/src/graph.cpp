@@ -102,13 +102,13 @@ Node* Graph::merge_nodes(Node* node1, Node* node2) {
 }
 
 // ADD update of unit_node_map if needed
-void Graph::split_nodes(Node* node){
+set<Node *> Graph::split_node(Node* node){
 	// this set can be used as needed
-    // 1. separate the units set
-    // 2. update the parent of children
-    // 3. add parent of all units
-    // 4. update parent of the node
-    // 5. update neighbours for the units
+  // 1. separate the units set
+  // 2. update the parent of children
+  // 3. add parent of all units
+  // 4. update parent of the node
+  // 5. update neighbours for the units
 
 	set<Node *> unit_nodes;
 	auto set_it = node->units_begin();
@@ -138,28 +138,31 @@ void Graph::split_nodes(Node* node){
 		(*it2)->delete_neighbour(node);
 	}
 
-    // task 3 and 4
-    for(auto it1 = node->parents_begin(); it1 != node->parents_end(); it1++){
-        (*it1)->delete_child(node);
-        for(auto it2 : unit_nodes){
-            if((*it1)->number_intersections(it2) > 0){
-                (*it1)->add_child(it2);
-                it2->add_parent(*it1);
-            }
-        }
+  // task 3 and 4
+  for(auto it1 = node->parents_begin(); it1 != node->parents_end(); it1++){
+    (*it1)->delete_child(node);
+    for(auto it2 : unit_nodes){
+      if((*it1)->number_intersections(it2) > 0){
+        (*it1)->add_child(it2);
+        it2->add_parent(*it1);
+      }
     }
+  }
 
-    // task 2
-    for(auto it1 = node->children_begin(); it1 != node->children_end(); it1++){
-        (*it1)->delete_parent(node);
-        for(auto it2 : unit_nodes){
-            if((*it1)->number_intersections(it2) > 0){
-                (*it1)->add_parent(it2);
-                it2->add_child(*it1);
-            }
-        }
+  // task 2
+  for(auto it1 = node->children_begin(); it1 != node->children_end(); it1++){
+    (*it1)->delete_parent(node);
+    for(auto it2 : unit_nodes){
+      if((*it1)->number_intersections(it2) > 0){
+        (*it1)->add_parent(it2);
+        it2->add_child(*it1);
+      }
     }
+  }
 
+  nodes.erase(node);
+  nodes.insert(unit_nodes.begin(), unit_nodes.end());
+  return unit_nodes;
 }
 
 void Graph::merge(){
@@ -203,7 +206,7 @@ void Graph::merge(){
   }
 }
 
-void Graph::merge(set<Node*> nodes_subset){
+void Graph::merge(set<Node*> &nodes_subset){
   set<Node*> failed_merge_nodes;
   int count_failed_merges = 0;
   int size = nodes_subset.size();
@@ -427,6 +430,20 @@ set<Node*> Graph::find_articulation_points(){
 	return articulation_points;
 }
 
+void Graph::remove_articulation_point(Node * node){
+  // 1. split the node and all the neighbours
+  // 2. call the merge on the resulting set of unit nodes
+
+  set<Node*> units = split_node(node);
+  set<Node*> neighbours;
+  neighbours.insert(node->neighbours_begin(), node->neighbours_end());
+  for(auto iter = node->neighbours_begin(); iter != node->neighbours_end(); iter++){
+    set<Node*> neighbour_units = split_node(*iter);
+    units.insert(neighbour_units.begin(), neighbour_units.end());
+  }
+
+  merge(units);
+}
 
 AxisAlignedBox3 Graph::getAABB() {
 	return aabb;
