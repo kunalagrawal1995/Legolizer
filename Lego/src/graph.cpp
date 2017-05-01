@@ -180,12 +180,12 @@ void Graph::merge(){
 	  }
 	}
 	
-	std::cout << size << " " << count_failed_merges << " " << std::endl;
+	// std::cout << size << " " << count_failed_merges << " " << std::endl;
 
 	if(merge(*node_merge_choice)){
 	  count_failed_merges = 0;
 	  failed_merge_nodes.clear();
-	  std::cout << "A new merger happened" << std::endl;
+	  // std::cout << "A new merger happened" << std::endl;
 	}
 	else{
 	  count_failed_merges++;
@@ -264,26 +264,27 @@ void Graph::graph_init(string voxel_filename){
 		}
 
 		int in;
-		for(int y = 0; y < dimension; y++){
-			for (int x = 0; x < dimension; ++x){
-				for (int z = 0; z < dimension; ++z){
+		for(int z = 0; z < dimension; z++){
+			for (int x = 0; x < dimension; x++){
+				for (int y = 0; y < dimension; y++){
 					voxel_file>>in;
 
 					if(in){
-						Node* node = new Node(x,y,z);
-						if(z != 0 && unit_node_map.count(Vector3(x,y,z-1))){
-							node->add_children(unit_node_map[Vector3(x,y,z-1)]);
+						Node* node = new Node(x,z,y);
+						if(y != 0 && unit_node_map.count(Vector3(x,z,y-1))){
+							node->add_child(unit_node_map[Vector3(x,z,y-1)]);
+							unit_node_map[Vector3(x,z,y-1)]->add_parent(node);
 						}
-						if(y != 0 && unit_node_map.count(Vector3(x,y-1,z))){
-							node->add_neighbour(unit_node_map[Vector3(x,y-1,z)]);
-							unit_node_map[Vector3(x,y-1,z)]->add_neighbour(node);
+						if(z != 0 && unit_node_map.count(Vector3(x,z-1,y))){
+							node->add_neighbour(unit_node_map[Vector3(x,z-1,y)]);
+							unit_node_map[Vector3(x,z-1,y)]->add_neighbour(node);
 						}
-						if(x != 0 && unit_node_map.count(Vector3(x-1,y,z))){
-							node->add_neighbour(unit_node_map[Vector3(x-1,y,z)]);
-							unit_node_map[Vector3(x-1,y,z)]->add_neighbour(node);
+						if(x != 0 && unit_node_map.count(Vector3(x-1,z,y))){
+							node->add_neighbour(unit_node_map[Vector3(x-1,z,y)]);
+							unit_node_map[Vector3(x-1,z,y)]->add_neighbour(node);
 						}
 						nodes.insert(node);
-						unit_node_map.insert(make_pair(Vector3(x,y,z),node));
+						unit_node_map.insert(make_pair(Vector3(x,z,y),node));
 						node->recomputeAABB();
 					}
 				}
@@ -300,6 +301,87 @@ void Graph::graph_init(string voxel_filename){
 		std::cerr<<"Unable to open file "<<voxel_filename<<std::endl;
 	}
 }
+
+void Graph::articulation_helper(Node * root, 
+	map<Node*, bool> &visited,
+	map<Node*, int> &disc,
+	map<Node*, int> &low,
+	map<Node*, Node*> &parent,
+	set<Node*> &articulation_points){
+
+	static int time = 0;
+	int children = 0;
+
+	visited[root] = true;
+
+	disc[root] = ++time;
+	low[root] = time;
+
+	// looking at all the neighbours of root
+	for(auto iter = root->children_begin(); iter != root->children_end(); iter++){
+		if(!visited[(*iter)]){
+			children++;
+			parent[(*iter)] = root;
+			articulation_helper((*iter), visited, disc, low, parent, articulation_points);
+			low[root] = min(low[root], low[(*iter)]);
+
+			// root is articulation point if 
+			if(parent[root] == NULL && children > 1){
+				articulation_points.insert(root);
+			}
+			if(parent[root] != NULL && low[(*iter)] >= disc[root]){
+				articulation_points.insert(root);
+			}
+		}
+		else if((*iter) != parent[root]){
+			low[root] = min(low[root], disc[(*iter)]);
+		}
+	}
+
+	for(auto iter = root->parents_begin(); iter != root->parents_end(); iter++){
+		if(!visited[(*iter)]){
+			children++;
+			parent[(*iter)] = root;
+			articulation_helper((*iter), visited, disc, low, parent, articulation_points);
+			low[root] = min(low[root], low[(*iter)]);
+
+			// root is articulation point if 
+			if(parent[root] == NULL && children > 1){
+				articulation_points.insert(root);
+			}
+			if(parent[root] != NULL && low[(*iter)] >= disc[root]){
+				articulation_points.insert(root);
+			}
+		}
+		else if((*iter) != parent[root]){
+			low[root] = min(low[root], disc[(*iter)]);
+		}
+	}
+
+}
+
+set<Node*> Graph::find_articulation_points(){
+	map<Node*, bool> visited;
+	map<Node*, int> disc;
+	map<Node*, int> low;
+	map<Node*, Node*> parent;
+	set<Node*> articulation_points;
+
+
+	// initialize
+	for(auto iter: nodes){
+		visited[iter] = false;
+		parent[iter] = NULL;
+	}
+
+	for(auto iter: nodes){
+		if(visited[iter] == false){
+			articulation_helper(iter, visited, disc, low, parent, articulation_points);
+		}
+	}
+	return articulation_points;
+}
+
 
 AxisAlignedBox3 Graph::getAABB() {
 	return aabb;
