@@ -462,7 +462,7 @@ void Graph::remove_articulation_point(Node * node){
 
 void Graph::render_articulation_points(Graphics::RenderSystem & rs){
 	set<Node*> pts = find_articulation_points();
-	rs.setPointSize(5.0f);
+	rs.setPointSize(10.0f);
 	rs.beginPrimitive(Graphics::RenderSystem::Primitive::POINTS);
     rs.setColor(ColorRGB(255, 0, 0));
     for(auto pt: pts) {

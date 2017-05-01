@@ -86,15 +86,52 @@ AxisAlignedBox3 Node::getAABB() {
 	return aabb;
 }
 
+ColorRGB Node::get_color() const{
+	double vol = aabb.volume();
+	if(vol == 1) {
+		return ColorRGB(255, 255, 255);
+	}
+	else if (vol == 2) {
+		return ColorRGB(255, 0, 0);
+	}
+	else if (vol == 4) {
+		// 2 cases
+		if((aabb.getExtent())[0] == 2 || (aabb.getExtent())[1] == 2)
+			return ColorRGB(0, 255, 0);
+		return ColorRGB(0, 0, 255);
+	}
+	else if (vol == 3) {
+		return ColorRGB(255, 255, 0);
+	}
+	else if (vol == 6) {
+		if((aabb.getExtent())[0] == 2 || (aabb.getExtent())[1] == 3 ||
+			(aabb.getExtent())[1] == 2 || (aabb.getExtent())[0] == 3)
+			return ColorRGB(0, 255, 255);
+		return ColorRGB(255, 0, 255);
+	}
+	else if (vol == 8) {
+		if((aabb.getExtent())[0] == 2 || (aabb.getExtent())[1] == 4 ||
+			(aabb.getExtent())[1] == 2 || (aabb.getExtent())[0] == 4)
+			return ColorRGB(100, 10, 200);
+		return ColorRGB(10, 100, 205);
+	}
+	else if (vol == 12) {
+		return ColorRGB(100, 201, 10);
+	}
+	else {
+		return ColorRGB(10, 200, 255);
+	}
+}
+
 void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3 trans, bool show_graph) const
 {
   // // Make this static to ensure just one shader is created. Assumes rendersystem is constant, not the best design pattern.
 
 	if(show_graph) {
-		rs.setPointSize(2.0f);
+		rs.setPointSize(5.0f);
 
 		rs.beginPrimitive(Graphics::RenderSystem::Primitive::POINTS);
-		rs.setColor(ColorRGB(100, 100, 100));
+		rs.setColor(ColorRGB(255, 255, 255));
 		Vector3 centroid = Vector3(0,0,0);
 		for(auto pos: units) {
 
@@ -124,7 +161,9 @@ void Node::draw(Graphics::RenderSystem & rs, int dimension, float scale, Vector3
 	rs.setPointSize(2.0f);
 
 	rs.beginPrimitive(Graphics::RenderSystem::Primitive::QUADS);
-	rs.setColor(ColorRGB(100, 100, 100));
+
+	rs.setColor(get_color());
+	
 	for(auto pos: units) {
 
 		Vector3 v0 = Vector3(pos[0], pos[1], pos[2])/(dimension * scale) -

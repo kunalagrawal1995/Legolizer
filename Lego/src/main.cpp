@@ -31,6 +31,8 @@ int main(int argc, char *argv[]){
 	
 	set<Node*> temp1 = graph.find_articulation_points();
 	cout << "Number of articulation points: " << temp1.size() << endl;
+
+	// set<Node*> temp1 = graph.find_articulation_points();
 	// cout << "PRINTING ARTICULATION POINTS.." << endl;
 	// for(auto iter: temp1){
 	// 	iter->print();

@@ -54,6 +54,7 @@ public:
 	void print();
 	void recomputeAABB();
 	Vector3 get_centroid();
+	ColorRGB get_color() const;
 };
 
 #endif
