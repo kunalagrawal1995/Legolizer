@@ -22,6 +22,7 @@ int Viewer::last_y = -1;
 int Viewer::drag_start_x = -1;
 int Viewer::drag_start_y = -1;
 bool Viewer::show_graph = false;
+bool Viewer::show_artpt = false;
 
 Matrix3
 dragToRotation(int x1, int y1, int x2, int y2, int width, int height, Camera const & camera)
@@ -153,12 +154,17 @@ Viewer::draw()
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::MODELVIEW); render_system->pushMatrix();
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::PROJECTION); render_system->pushMatrix();
 
-      render_system->setCamera(camera);
+    render_system->setCamera(camera);
 
-      Real scale = graph->getAABB().getExtent().length();
-      
-      // Draw the 
-      graph->draw(*render_system, show_graph);
+    Real scale = graph->getAABB().getExtent().length();
+    
+    // Draw the 
+    graph->draw(*render_system, show_graph);
+
+    if(show_artpt) {
+      // std::cout<<"AP"<<std::endl;
+      graph->render_articulation_points(*render_system);
+    }
 
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::PROJECTION); render_system->popMatrix();
     render_system->setMatrixMode(Graphics::RenderSystem::MatrixMode::MODELVIEW); render_system->popMatrix();
@@ -192,6 +198,10 @@ Viewer::keyPress(unsigned char key, int x, int y)
   }
   else if (key == 'g' || key == 'G') {
     show_graph = !show_graph;
+    glutPostRedisplay();
+  }
+  else if (key == 'a' || key == 'A') {
+    show_artpt = !show_artpt;
     glutPostRedisplay();
   }
 }

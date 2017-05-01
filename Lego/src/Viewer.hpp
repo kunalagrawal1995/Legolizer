@@ -24,6 +24,7 @@ class Viewer
     static int last_x, last_y;
     static int drag_start_x, drag_start_y;
     static bool show_graph;
+    static bool show_artpt;
 
 
   public:

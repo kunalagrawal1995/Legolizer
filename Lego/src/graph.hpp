@@ -52,6 +52,7 @@ public:
 
 
 	set<Node*> find_articulation_points();
+	void render_articulation_points(Graphics::RenderSystem & rs);
 
 	AxisAlignedBox3 getAABB();
 	void draw(Graphics::RenderSystem & rs, bool show_graph) const;

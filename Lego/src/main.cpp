@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
 	read_lego_bricks("src/legoBricksConfig.txt");
 	
 
-	graph.merge();
+	// graph.merge();
 	set<Node*> temp = graph.find_articulation_points();
 	cout<<"PRINTING ARTICULATION POINTS.."<<endl;
 	for(auto iter: temp){
