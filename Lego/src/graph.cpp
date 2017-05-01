@@ -18,12 +18,12 @@ void print_neighbors(Node * node){
 Node* Graph::merge_nodes(Node* node1, Node* node2) {
   // std::cout<<"merging 2 nodes"<<std::endl;
 	// 1: union of units
-    // 2: union of children
-    // 3: union of parents
-    // 4: update parents of children
-    // 5: update children of parents
-    // 6: unions of neighbours(delete node1 and node2)
-    // 7: update neighbours
+  // 2: union of children
+  // 3: union of parents
+  // 4: update parents of children
+  // 5: update children of parents
+  // 6: unions of neighbours(delete node1 and node2)
+  // 7: update neighbours
 
 
 	Node* mergedNode = new Node();
@@ -113,14 +113,14 @@ set<Node *> Graph::split_node(Node* node){
 	set<Node *> unit_nodes;
 	auto set_it = node->units_begin();
 	auto set_end = node->units_end();
-    // task 1
+  // task 1
 	for(; set_it != set_end; set_it++){
 		Node* n = new Node(*set_it);
+    unit_nodes.insert(n);
 		n->recomputeAABB();
 	}
 
-
-    // task 5
+  // task 5
 	for(auto it1: unit_nodes){
 		for (auto it2: unit_nodes){
 			if((it1)->check_neighbour(it2))
@@ -211,6 +211,7 @@ void Graph::merge(set<Node*> &nodes_subset){
   int count_failed_merges = 0;
   int size = nodes_subset.size();
   while(true){    
+    // cout << size << endl;
     int pick = rand()%size;
     set<Node*>::iterator node_merge_choice = nodes_subset.begin();
     for(int i = 1; i<pick; i++){
@@ -222,7 +223,7 @@ void Graph::merge(set<Node*> &nodes_subset){
       pick = rand()%size;
       node_merge_choice = nodes_subset.begin();
       for(int i = 1; i<=pick; i++){
-      node_merge_choice++;
+        node_merge_choice++;
       }
     }
     
@@ -244,10 +245,12 @@ void Graph::merge(set<Node*> &nodes_subset){
     }
 
     size = nodes_subset.size();
+    // cout << "later " << size << " " << count_failed_merges << endl;
     if(count_failed_merges == size){
       break;
     }
   }
+  cout << "function ended" << endl;
 }
 
 Node* Graph::check_merge(Node* node){
@@ -405,7 +408,6 @@ void Graph::articulation_helper(Node * root,
 			low[root] = min(low[root], disc[(*iter)]);
 		}
 	}
-
 }
 
 set<Node*> Graph::find_articulation_points(){
@@ -433,16 +435,28 @@ set<Node*> Graph::find_articulation_points(){
 void Graph::remove_articulation_point(Node * node){
   // 1. split the node and all the neighbours
   // 2. call the merge on the resulting set of unit nodes
-
   set<Node*> units = split_node(node);
   set<Node*> neighbours;
   neighbours.insert(node->neighbours_begin(), node->neighbours_end());
-  for(auto iter = node->neighbours_begin(); iter != node->neighbours_end(); iter++){
-    set<Node*> neighbour_units = split_node(*iter);
+  for(auto iter : neighbours){
+    set<Node*> neighbour_units = split_node(iter);
     units.insert(neighbour_units.begin(), neighbour_units.end());
   }
 
   merge(units);
+
+}
+
+void Graph::render_articulation_points(Graphics::RenderSystem & rs){
+	set<Node*> pts = find_articulation_points();
+	rs.setPointSize(5.0f);
+	rs.beginPrimitive(Graphics::RenderSystem::Primitive::POINTS);
+    rs.setColor(ColorRGB(255, 0, 0));
+    for(auto pt: pts) {
+      Vector3 centroid = pt->get_centroid();
+      rs.sendVertex(centroid/(dimension * scale) - trans);
+    }
+    rs.endPrimitive();
 }
 
 AxisAlignedBox3 Graph::getAABB() {

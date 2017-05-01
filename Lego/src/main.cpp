@@ -21,17 +21,17 @@ int main(int argc, char *argv[]){
 		iter->print();
 	}
 	
-	// for(auto iter: temp){
-	// 	graph.remove_articulation_point(iter);
-	// }
-	// cout << "ARTICULATION POINTS REMOVAL ATTEMPTED" << endl;
+	if(temp.size() > 0){
+		graph.remove_articulation_point(*(temp.begin()));
+	}
+	cout << "ARTICULATION POINTS REMOVAL ATTEMPTED" << endl;
 	
-	// set<Node*> temp1 = graph.find_articulation_points();
-	// cout << "PRINTING ARTICULATION POINTS.." << endl;
-	// for(auto iter: temp1){
-	// 	iter->print();
-	// }
-	// cout << "DONE" << endl;
+	set<Node*> temp1 = graph.find_articulation_points();
+	cout << "PRINTING ARTICULATION POINTS.." << endl;
+	for(auto iter: temp1){
+		iter->print();
+	}
+	cout << "DONE" << endl;
 	// graph.print();
 	Viewer viewer;
 	viewer.setObject(&graph);
